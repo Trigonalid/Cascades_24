@@ -1,0 +1,165 @@
+# Bray-Curtis difference
+
+```{r}
+BC_fig <- read_excel("~/ownCloud/000_/000_R_stat/ParaDiv_2023/output/BC_fig.xlsx")
+BC_fig_sub <- BC_fig %>% 
+  filter(guild %in% c("Parasitoids", "Caterpillars - subsampled"))
+
+# test the difference between groups
+
+BC_aov <- aov(hodnota ~ guild, data = BC_fig)
+summary(BC_aov)
+tukey_result <- TukeyHSD(BC_aov)
+tukey_result
+
+BC_aov_2 <- aov(hodnota ~ guild, data = BC_fig_sub)
+summary(BC_aov_2)
+tukey_result_2 <- TukeyHSD(BC_aov_2)
+tukey_result_2
+
+library(ggplot2)
+
+# Boxplot
+ggplot(BC_fig, aes(x = guild, y = hodnota, fill = guild)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Three Groups",
+       x = "Group",
+       y = "Value") +
+  theme_minimal()
+
+group1 <- BC_fig %>% 
+  select(guild, hodnota) %>% 
+  filter(guild== "Caterpillars")
+group1 <- group1 %>% 
+  select(hodnota)
+
+group2 <- BC_fig %>% 
+  select(guild, hodnota) %>% 
+  filter(guild== "Caterpillars - subsampled")
+group2 <- group2 %>% 
+  select(hodnota) %>% 
+  as.numeric()
+
+group3 <- BC_fig %>% 
+  select(guild, hodnota) %>% 
+  filter(guild== "Parasitoids")
+group3 <- group3 %>% 
+  select(hodnota)
+
+# Suppose you have mean values
+mean_A <- mean(group1$hodnota)
+mean_B <- mean(group2$hodnota)
+mean_C <- mean(group3$hodnota)
+# Calculate percentage difference
+percentage_difference_cats <- ((mean_B - mean_A) / mean_A) * 100
+percentage_difference_cats
+
+percentage_sifference_PAR_CAT <-  ((mean_C - mean_A) / mean_A) * 100
+percentage_sifference_PAR_CAT
+
+```
+# Chao-Sorensen difference
+```{r}
+CS_fig_data_2 <- read_excel("~/ownCloud/000_/000_R_stat/ParaDiv_2023/output/CS_fig_data_2.xlsx")
+
+
+# test the difference between groups
+
+CS_aov <- aov(hodnota ~ guild, data = CS_fig_data_2)
+summary(CS_aov)
+tukey_result <- TukeyHSD(CS_aov)
+tukey_result
+
+library(ggplot2)
+
+# Boxplot
+ggplot(CS_fig_data_2, aes(x = guild, y = hodnota, fill = guild)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Three Groups",
+       x = "Group",
+       y = "Value") +
+  theme_minimal()
+
+group1 <- CS_fig_data_2 %>% 
+  select(guild, hodnota) %>% 
+  filter(guild== "Caterpillars")
+group1 <- group1 %>% 
+  select(hodnota)
+
+group2 <- CS_fig_data_2 %>% 
+  select(guild, hodnota) %>% 
+  filter(guild == "Caterpillars_subsampled")
+group2 <- group2 %>% 
+  select(hodnota)
+
+group3 <- CS_fig_data_2 %>% 
+  select(guild, hodnota) %>% 
+  filter(guild== "Parasitoids")
+group3 <- group3 %>% 
+  select(hodnota)
+
+# Suppose you have mean values
+mean_A <- mean(group1$hodnota)
+mean_B <- mean(group2$hodnota)
+mean_C <- mean(group3$hodnota)
+# Calculate percentage difference
+percentage_difference_cats <- ((mean_B - mean_A) / mean_A) * 100
+percentage_difference_cats
+
+percentage_sifference_PAR_CAT <-  ((mean_C - mean_A) / mean_A) * 100
+percentage_sifference_PAR_CAT
+
+```
+
+# Sorensen comparison
+```{r}
+Sor_fig <- read_excel("~/ownCloud/000_/000_R_stat/ParaDiv_2023/output/Sor_fig_data_rozdeleni.xlsx")
+
+# test the difference between groups
+
+SOR_aov <- aov(hodnota ~ guild, data = Sor_fig)
+summary(SOR_aov)
+tukey_result <- TukeyHSD(SOR_aov)
+tukey_result
+
+library(ggplot2)
+
+# Boxplot
+ggplot(Sor_fig, aes(x = guild, y = hodnota, fill = guild)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Three Groups",
+       x = "Group",
+       y = "Value") +
+  theme_minimal()
+
+group1 <- Sor_fig %>% 
+  select(guild, hodnota) %>% 
+  filter(guild== "Caterpillars")
+group1 <- group1 %>% 
+  select(hodnota)
+
+group2 <- Sor_fig %>% 
+  select(guild, hodnota) %>% 
+  filter(guild == "Caterpillars_subsampled")
+group2 <- group2 %>% 
+  select(hodnota)
+
+group3 <- Sor_fig %>% 
+  select(guild, hodnota) %>% 
+  filter(guild== "Parasitoids")
+group3 <- group3 %>% 
+  select(hodnota)
+
+# Suppose you have mean values
+mean_A <- mean(group1$hodnota)
+mean_B <- mean(group2$hodnota)
+mean_C <- mean(group3$hodnota)
+# Calculate percentage difference
+percentage_difference_cats <- ((mean_B - mean_A) / mean_A) * 100
+percentage_difference_cats
+
+percentage_sifference_PAR_CAT <-  ((mean_C - mean_A) / mean_A) * 100
+percentage_sifference_PAR_CAT
+
+```
+

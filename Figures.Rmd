@@ -1,0 +1,167 @@
+
+library(ggplot2)
+Figure 1 - Beta diversity of parasitoids and caterpillars
+- 
+
+
+
+
+
+```{r}
+# colours 
+  Parasitoids: tmavě zelená: #1b9e77
+  Caterpillars: oranžová: #d95f02
+Subsampled caterpillars: světle oranžová #ffb681
+
+
+
+```
+
+Figure 2 - Food web interactions and its dissimilarity
+
+```{r}
+# ST
+# Ensure "CAT-PLANT Subsampled" is added as a level
+levels(graf_ST$dataset_type) <- c(levels(graf_ST$dataset_type), "CAT-PLANT Subsampled")
+
+# Replace "Subsampled" with "Petr"
+graf_ST$dataset_type[graf_ST$dataset_type == "Subsampled"] <- "CAT-PLANT Subsampled"
+
+
+Fig_ST <- ggplot(graf_ST, aes(x = dataset_type, y = value, color = dataset_type, shape = dataset_type, alpha = dataset_type)) +
+  geom_boxplot(colour = "black") +
+  geom_jitter(size = 2) +
+  stat_summary(fun = median, geom = "point", size = 2, color = "red") +
+  labs(title = "ST", x = "", y = "Dissimilarity by species turnover") +
+  scale_alpha_manual(values = c("PAR-CAT" = 0.7, "CAT-PLANT" = 0.7, "CAT-PLANT Subsampled" = 0.5)) +
+  scale_color_manual(values = c("PAR-CAT" = "#1b9e77", "CAT-PLANT" = "#d95f02", "CAT-PLANT Subsampled" = "#ffb681")) +
+  scale_shape_manual(values = c("PAR-CAT" = 16, "CAT-PLANT" = 16, "CAT-PLANT Subsampled" = 17)) +  # Change shape only for 'CAT-PLANT Subsampled'
+  theme_classic(); Fig_ST
+
+Fig_OS <- ggplot(graf_OS, aes(x = dataset_type, y = value, color = dataset_type)) +
+  geom_violin(trim = FALSE, colour = "black") +
+  geom_jitter(size = 2, alpha = 0.3) +
+  stat_summary(fun.y=median, geom="point", size=2, color="red") +
+  labs(title = "OS", x = "", y = "Dissimilairty explained by rewiring") +
+  theme_classic() ; Fig_OS <- Fig_OS + scale_color_brewer(palette="Dark2")
+
+Fig_WN <- ggplot(graf_WN, aes(x = dataset_type, y = value, color = dataset_type)) +
+  geom_violin(trim = FALSE, colour = "black") +
+  geom_jitter(size = 2, alpha = 0.3) +
+  stat_summary(fun.y=median, geom="point", size=2, color="red") +
+  labs(title = "WN", x = "", y = "General dissimilairty between the two networks") +
+  theme_classic() ; Fig_WN <- Fig_WN + scale_color_brewer(palette="Dark2")  ; Fig_WN
+
+fig_subsampling <- ggarrange(FNULLfig_subsampling <- ggarrange(Fig_WN, Fig_OS, Fig_ST, common.legend = TRUE, legend = "bottom", nrow = 1)
+
+
+fig_subsampling
+ggsave("output/fig/fig_subsampling.png",
+       fig_subsampling,
+       height = 9,
+       width = 22,
+       units = "cm"
+)
+
+
+
+
+```
+
+Figure 1
+
+```{r}
+# ST
+# Ensure "CAT-PLANT Subsampled" is added as a level
+levels(graf_ST$dataset_type) <- c(levels(graf_ST$dataset_type), "CAT-PLANT Subsampled")
+
+# Replace "Subsampled" with "Petr"
+graf_ST$dataset_type[graf_ST$dataset_type == "Subsampled"] <- "CAT-PLANT Subsampled"
+
+
+Fig_ST <- ggplot(graf_ST, aes(x = dataset_type, y = value, color = dataset_type, shape = dataset_type, alpha = dataset_type)) +
+  geom_boxplot(colour = "black") +
+  geom_jitter(size = 2) +
+  stat_summary(fun = median, geom = "point", size = 2, color = "red") +
+  labs(title = "ST", x = "", y = "Dissimilarity by species turnover") +
+  scale_alpha_manual(values = c("PAR-CAT" = 0.7, "CAT-PLANT" = 0.7, "CAT-PLANT Subsampled" = 0.5)) +
+  scale_color_manual(values = c("PAR-CAT" = "#1b9e77", "CAT-PLANT" = "#d95f02", "CAT-PLANT Subsampled" = "#ffb681")) +
+  scale_shape_manual(values = c("PAR-CAT" = 16, "CAT-PLANT" = 16, "CAT-PLANT Subsampled" = 17)) +  # Change shape only for 'CAT-PLANT Subsampled'
+  coord_cartesian(ylim = c(0, 1)) +
+  theme_classic(); Fig_ST
+
+# OS
+# Ensure "CAT-PLANT Subsampled" is added as a level
+levels(graf_OS$dataset_type) <- c(levels(graf_OS$dataset_type), "CAT-PLANT Subsampled")
+
+# Replace "Subsampled" with "Petr"
+graf_OS$dataset_type[graf_OS$dataset_type == "Subsampled"] <- "CAT-PLANT Subsampled"
+
+
+Fig_OS <- ggplot(graf_OS, aes(x = dataset_type, y = value, color = dataset_type, shape = dataset_type, alpha = dataset_type)) +
+  geom_boxplot(colour = "black") +
+  geom_jitter(size = 2) +
+  stat_summary(fun = median, geom = "point", size = 2, color = "red") +
+  labs(title = "OS", x = "", y = "Dissimilarity by species turnover") +
+  scale_alpha_manual(values = c("PAR-CAT" = 0.7, "CAT-PLANT" = 0.7, "CAT-PLANT Subsampled" = 0.5)) +
+  scale_color_manual(values = c("PAR-CAT" = "#1b9e77", "CAT-PLANT" = "#d95f02", "CAT-PLANT Subsampled" = "#ffb681")) +
+  scale_shape_manual(values = c("PAR-CAT" = 16, "CAT-PLANT" = 16, "CAT-PLANT Subsampled" = 17)) +  # Change shape only for 'CAT-PLANT Subsampled' 
+  coord_cartesian(ylim = c(0, 1)) +
+  theme_classic(); Fig_OS
+
+# ST
+# Ensure "CAT-PLANT Subsampled" is added as a level
+levels(graf_WN$dataset_type) <- c(levels(graf_WN$dataset_type), "CAT-PLANT Subsampled")
+
+# Replace "Subsampled" with "Petr"
+graf_WN$dataset_type[graf_WN$dataset_type == "Subsampled"] <- "CAT-PLANT Subsampled"
+
+
+Fig_WN <- ggplot(graf_WN, aes(x = dataset_type, y = value, color = dataset_type, shape = dataset_type, alpha = dataset_type)) +
+  geom_boxplot(colour = "black") +
+  geom_jitter(size = 2) +
+  stat_summary(fun = median, geom = "point", size = 2, color = "red") +
+  labs(title = "WN", x = "", y = "Dissimilarity by species turnover") +
+  scale_alpha_manual(values = c("PAR-CAT" = 0.7, "CAT-PLANT" = 0.7, "CAT-PLANT Subsampled" = 0.5)) +
+  scale_color_manual(values = c("PAR-CAT" = "#1b9e77", "CAT-PLANT" = "#d95f02", "CAT-PLANT Subsampled" = "#ffb681")) +
+  scale_shape_manual(values = c("PAR-CAT" = 16, "CAT-PLANT" = 16, "CAT-PLANT Subsampled" = 17)) +  # Change shape only for 'CAT-PLANT Subsampled'
+  coord_cartesian(ylim = c(0, 1)) +
+  theme_classic() + scale_fill_discrete(name= "Dataset"); Fig_WN
+
+fig_subsampling <- ggarrange(Fig_WN, Fig_OS, Fig_ST, common.legend = TRUE, legend = "bottom", nrow = 1)
+
+
+fig_subsampling
+ggsave("output/fig/fig_subsampling.png",
+       fig_subsampling,
+       height = 9,
+       width = 22,
+       units = "cm"
+)
+
+
+```
+
+Figure 1
+
+```{r}
+
+```
+
+Figure 1
+
+```{r}
+
+```
+
+Figure 1
+
+```{r}
+
+```
+
+Figure 1
+
+```{r}
+
+```

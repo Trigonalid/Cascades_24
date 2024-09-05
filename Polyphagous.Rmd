@@ -1,0 +1,171 @@
+
+
+```{r}
+library(dplyr)
+library(vegan)
+library(ggplot2)
+library(reshape)
+library(betapart)
+library(fossil)
+```
+# Bray-Curtis for parasitoids
+```{r}
+MASTER <- read.csv("~/ownCloud/000_/000_R_stat/Cascading_diversity/DATA/MASTER.csv", sep=";") %>% as_tibble() # loading the master file with
+Distance <- 
+  read.csv2(
+    here::here("~/ownCloud/000_/000_R_stat/Beta_diversity/data/input/Distance22.csv"), row.names=1)
+
+# data for parasitoids
+para_pivot<-  MASTER  %>%
+  filter(`guild` == "PAR", Par_remove == "0") %>%
+  select(locality, PAR_sp, GENERAL)
+
+mono_pivot <- para_pivot %>% 
+  filter(GENERAL == "MONO")
+
+mono_pivot_tab <- as.matrix(table(mono_pivot$locality, mono_pivot$PAR_sp))
+
+
+general_pivot <- para_pivot %>% 
+  filter(GENERAL == "GEN")
+gen_pivot_tab <- as.matrix(table(general_pivot$locality, general_pivot$PAR_sp))
+
+#Bray-Curtis index for monophagus parasitoids
+BC_mono_par<- vegdist(mono_pivot_tab, method="bray", binary=FALSE, diag=TRUE) %>% as.matrix()
+BC_res_par_mantel_mono <- mantel(BC_mono_par, Distance , method="spear"); BC_res_par_mantel_mono
+
+#Bray-Curtis index for generalist parasitoids
+
+BC_general_par<- vegdist(gen_pivot_tab, method="bray", binary=FALSE, diag=TRUE) %>% as.matrix()
+BC_res_par_mantel_general <- mantel(BC_general_par, Distance , method="spear"); BC_res_par_mantel_general
+
+BC_mono_par_melt <- melt(BC_mono_par)%>%
+  add_column(guild = "MONO") 
+BC_mono_par_melt <- dplyr:: rename (BC_mono_par_melt, Locality_A =X1, Locality_B = X2, hodnota = value)
+
+
+BC_general_par_melt <- melt(BC_general_par)%>%
+  add_column(guild = "GENERAL")
+BC_general_par_melt <- dplyr:: rename (BC_general_par_melt, Locality_A =X1, Locality_B = X2, hodnota = value)
+
+mono_BC <- rbind(BC_mono_par_melt, BC_general_par_melt)
+
+box_poly <- ggplot(mono_BC, aes(x = guild, y = hodnota, fill = guild)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Monophagous and Generalist parasitoids",
+       x = "Group",
+       y = "Value") +
+  theme_minimal()
+box_poly
+
+polyphagous_parasitoids <- read.csv("~/ownCloud/000_/000_R_stat/Cascading_diversity/DATA/polyphagous_parasitoids.csv", sep=";") 
+
+poly_distance <- ggplot(polyphagous_parasitoids, aes(x = distance, y = hodnota, fill = guild)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Monophagous and Generalist parasitoids across tropical forest",
+       x = "Group",
+       y = "Value") +
+  theme_minimal()
+poly_distance 
+
+
+Bray_Curtis_fig_poly <-ggplot(polyphagous_parasitoids, aes(x=distance, y=hodnota,color = guild ))  +
+  geom_point(aes(shape=guild, color=guild)) + 
+  scale_shape_manual(values=c(16, 1)) +
+  stat_smooth(method=lm, se=FALSE) + 
+  labs(x= "Distance [km]", y= "Bray-Curtis") +
+  theme_classic(base_size = 16) + theme(legend.position = "bottom") + ylim(0, 1)
+Bray_Curtis_fig_poly 
+
+```
+# Sorensen
+```{r}
+# Load required libraries
+library(dplyr)
+library(vegan)
+library(reshape2)
+library(ggplot2)
+
+# Data for parasitoids
+para_pivot <- MASTER %>%
+  filter(guild == "PAR", Par_remove == "0") %>%
+  select(locality, PAR_sp, GENERAL)
+
+# Monophagous parasitoids
+mono_pivot <- para_pivot %>%
+  filter(GENERAL == "MONO")
+mono_pivot_tab <- as.matrix(table(mono_pivot$locality, mono_pivot$PAR_sp))
+mono_pivot_tab[is.na(mono_pivot_tab)] <- 0 # Replacing NA values with 0
+mono_pivot_tab <- mono_pivot_tab
+mono_pivot_tab [mono_pivot_tab > 0] <- 1 
+
+
+# Generalist parasitoids
+general_pivot <- para_pivot %>%
+  filter(GENERAL == "GEN")
+gen_pivot_tab <- as.matrix(table(general_pivot$locality, general_pivot$PAR_sp))
+gen_pivot_tab[is.na(gen_pivot_tab)] <- 0 # Replacing NA values with 0
+gen_pivot_tab <- gen_pivot_tab
+gen_pivot_tab [gen_pivot_tab > 0] <- 1 
+
+# Sørensen index for monophagous parasitoids
+sorensen_mono_par <- beta.pair(mono_pivot_tab)
+sorensen_mono_par<-(as.matrix(sorensen_mono_par$beta.sor))
+
+sorensen_res_par_mantel_mono <- mantel(sorensen_mono_par, Distance, method = "spear")
+sorensen_res_par_mantel_mono
+sor_mean_mono <- mean(sorensen_mono_par)
+
+# Sørensen index for generalist parasitoids
+sorensen_gen_par <- beta.pair(gen_pivot_tab)
+sorensen_gen_par<-(as.matrix(sorensen_gen_par$beta.sor))
+sor_mean_gen <- mean(sorensen_gen_par)
+
+sorensen_res_par_mantel_gen <- mantel(sorensen_gen_par, Distance, method = "spear")
+sorensen_res_par_mantel_gen
+
+
+
+
+# Melt data for plotting
+sorensen_mono_par_melt <- melt(sorensen_mono_par) %>%
+  add_column(guild = "MONO")
+
+sorensen_general_par_melt <- melt(sorensen_general_par) %>%
+  add_column(guild = "GENERAL") %>%
+  dplyr::rename(Locality_A = X1, Locality_B = X2, hodnota = value)
+
+# Combine data
+mono_sorensen <- rbind(sorensen_mono_par_melt, sorensen_general_par_melt)
+
+# Plot
+box_poly <- ggplot(mono_sorensen, aes(x = guild, y = hodnota, fill = guild)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Monophagous and Generalist parasitoids",
+       x = "Group",
+       y = "Value") +
+  theme_minimal()
+box_poly
+
+polyphagous_parasitoids <- read.csv("~/ownCloud/000_/000_R_stat/Cascading_diversity/DATA/polyphagous_parasitoids.csv", sep = ";")
+
+poly_distance <- ggplot(polyphagous_parasitoids, aes(x = distance, y = hodnota, fill = guild)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Monophagous and Generalist parasitoids across tropical forest",
+       x = "Group",
+       y = "Value") +
+  theme_minimal()
+poly_distance
+
+Sørensen_fig_poly <- ggplot(polyphagous_parasitoids, aes(x = distance, y = hodnota, color = guild)) +
+  geom_point(aes(shape = guild, color = guild)) +
+  scale_shape_manual(values = c(16, 1)) +
+  stat_smooth(method = lm, se = FALSE) +
+  labs(x = "Distance [km]", y = "Sørensen Index") +
+  theme_classic(base_size = 16) +
+  theme(legend.position = "bottom") +
+  ylim(0, 1)
+Sørensen_fig_poly
+
+```
+

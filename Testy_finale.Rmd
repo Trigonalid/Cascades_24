@@ -1,0 +1,22 @@
+
+
+# Means of indices for TAB S1
+```{r}
+indexy <-
+  readr::read_delim(
+    here::here(
+      "DATA/index_all_fig.csv"
+    ),
+    delim = ";"
+  ) %>%
+  tibble::as_tibble()
+
+index_CS <- indexy %>% 
+  dplyr::filter(Index == "Chao-Sorensen")
+index_BC <- indexy %>% 
+  dplyr::filter(Index == "Bray-Curtis")
+index_SOR <- indexy %>% 
+  dplyr::filter(Index == "Sorensen")
+
+```
+
